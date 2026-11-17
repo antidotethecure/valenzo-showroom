@@ -20,12 +20,12 @@
     { id: "bc_black", cat: "denim", name: "Signature V Boot Cut", tone: "Black", desc: "Black denim with the signature V stitched in grey." },
     { id: "bc_ice", cat: "denim", name: "Signature V Boot Cut", tone: "Ice Wash", desc: "Ice wash denim with the signature V stitched in dark thread." }
   ];
-  /* the polo colours listed in the Shopify store: photo cards only, no 3D model yet, so they stay out of the fitting room */
+  /* the polo colours listed in the Shopify store: mannequin-picture cards only (class "flat"), no 3D model yet, so they stay out of the fitting room */
   [["01", "White Black"], ["05", "Black White"], ["06", "Black Grey White"], ["07", "Black Blue Khaki White"], ["08", "Black Navy White"], ["09", "Black Grey White"],
    ["10", "Black Blue White"], ["11", "Black Brown White"], ["12", "Black Navy White"], ["13", "Black Navy White"], ["14", "Black White"]].forEach(function (p) {
     p[1].split(" ").forEach(function (c) { ITEMS.push({ id: "vps" + p[0] + "_" + c.toLowerCase(), cat: "polo", name: "VPS" + p[0] + " Polo Shirt", tone: c, flat: true }); });
   });
-  /* long sleeve shirts and jeans from the studio's 11-16 photo sets: photo cards only, one card per photo */
+  /* long sleeve shirts and jeans from the studio's 11-16 photo sets: mannequin-picture cards only, one card per photo */
   [["crystal", "VPL15 Long Sleeve Shirt", "Black,Red,White"], ["crystal", "VPL16 Long Sleeve Shirt", "Black,White"], ["crystal", "VPL18 Long Sleeve Shirt", "Black,Navy,White"],
    ["crystal", "VPL19 Long Sleeve Shirt", "Black,White"], ["print", "VPL20 Long Sleeve Shirt", "Black,Blue,White"], ["print", "VPL21 Long Sleeve Shirt", "Beige,Black,Blue,White"],
    ["print", "VPL22 Long Sleeve Shirt", "Beige,Black,Green,White"], ["print", "VPL23 Long Sleeve Shirt", "Black,Red,White"], ["print", "VPL24 Long Sleeve Shirt", "Black,Brown"],
@@ -53,6 +53,9 @@
     ITEMS.map(function (it) { return it.id; }).filter(function (id) { return id.indexOf(k) === 0; }).sort()
       .forEach(function (id, i) { LOOKS.push([id, ["vdm07", "bc_blue", "bc_black", "bc_ice"][i % 4]]); });
   });
+  /* a photo-set piece is shown on a mannequin too: a shirt in the picture the floor uses, jeans in their own img/on-<id>.webp */
+  var WORN = {};
+  LOOKS.forEach(function (l) { WORN[l[0]] = "on-" + l[0] + "-" + l[1]; });
   /* names, colours and descriptions in the visitor's language; a style number (VPL15) stays as it is */
   ITEMS.forEach(function (it) {
     it.name = it.name.replace(/^(V[A-Z]+\d+ )?(.+)$/, function (all, code, words) { return (code || "") + T(words); });
@@ -68,7 +71,7 @@
   function full(it) { return it.name + T(" in ") + it.tone; }
   function item(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === id) return ITEMS[i]; }
   function kind(it) { return it.cat === "denim" ? "bottom" : "top"; }
-  function pic(it, cls) { var im = el("img", cls); im.src = "img/" + it.id + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
+  function pic(it, cls) { var im = el("img", cls); im.src = "img/" + (it.flat ? WORN[it.id] || "on-" + it.id : it.id) + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
 
   document.addEventListener("DOMContentLoaded", function () {
     var grid = $("grid"), cats = $("cats"), floor = $("floor"), hall = $("hall"), ui = {}, size = { top: "M", bottom: "32" }, booted = false;
@@ -126,7 +129,7 @@
     ITEMS.forEach(function (it) {
       var li = el("li"), b = el(it.flat ? "div" : "button", it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
       b.type = "button"; im.loading = "lazy";
-      im.alt = full(it) + (it.flat ? "" : T(" on a display mannequin"));
+      im.alt = full(it) + T(" on a display mannequin");
       n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
       m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
       b.appendChild(n); b.appendChild(m); li.appendChild(b); li.dataset.cat = it.cat; li.id = "c-" + it.id; grid.appendChild(li);
