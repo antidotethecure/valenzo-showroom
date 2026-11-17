@@ -24,6 +24,17 @@
    ["10", "Black Blue White"], ["11", "Black Brown White"], ["12", "Black Navy White"], ["13", "Black Navy White"], ["14", "Black White"]].forEach(function (p) {
     p[1].split(" ").forEach(function (c) { ITEMS.push({ id: "vps" + p[0] + "_" + c.toLowerCase(), cat: "polo", name: "VPS" + p[0] + " Polo Shirt", tone: c, flat: true }); });
   });
+  /* long sleeve shirts and jeans from the studio's 11-16 photo sets: photo cards only, one card per photo */
+  [["crystal", "VPL15 Long Sleeve Shirt", "Black,Red,White"], ["crystal", "VPL16 Long Sleeve Shirt", "Black,White"], ["crystal", "VPL18 Long Sleeve Shirt", "Black,Navy,White"],
+   ["crystal", "VPL19 Long Sleeve Shirt", "Black,White"], ["print", "VPL20 Long Sleeve Shirt", "Black,Blue,White"], ["print", "VPL21 Long Sleeve Shirt", "Beige,Black,Blue,White"],
+   ["print", "VPL22 Long Sleeve Shirt", "Beige,Black,Green,White"], ["print", "VPL23 Long Sleeve Shirt", "Black,Red,White"], ["print", "VPL24 Long Sleeve Shirt", "Black,Brown"],
+   ["print", "VPL25 Long Sleeve Shirt", "Beige,Black,Green,White"], ["print", "VPL26 Long Sleeve Shirt", "Brown,Navy,Red,White"], ["print", "VPL27 Long Sleeve Shirt", "Black,Brown,Burgundy,Grey"],
+   ["print", "VPL28 Long Sleeve Shirt", "Blue,Brown,Green,White"],
+   ["denim", "VDM03 Denim Jeans", "Black \u00b7 Front,Black \u00b7 Back,Light Blue \u00b7 Front,Light Blue \u00b7 Back"], ["denim", "VDM05 Denim Jeans", "Black \u00b7 Back,Dark Indigo \u00b7 Front,Dark Indigo \u00b7 Back"],
+   ["denim", "VDM06 Denim Jeans", "Black \u00b7 Front,Blue \u00b7 Front,Blue \u00b7 Back,Light Blue \u00b7 Back"], ["denim", "VDM08 Denim Jeans", "Light Blue \u00b7 Front"],
+   ["denim", "VMD05 Denim Jeans", "Black \u00b7 Front,Black \u00b7 Back"]].forEach(function (p) {
+    p[2].split(",").forEach(function (c) { ITEMS.push({ id: (p[1].split(" ")[0] + "_" + c).toLowerCase().replace(/[^a-z0-9]+/g, "_"), cat: p[0], name: p[1], tone: c, flat: true }); });
+  });
   /* shortcut: sample size run and no prices, because the shop's own listings could not be read; put the studio's real sizes here and a price (a number, in dollars) on each item when they send them */
   var SIZES = {   // [label, how much wider the mannequin stands than at the middle size]
     top: [["S", 0.96], ["M", 1], ["L", 1.04], ["XL", 1.08], ["2XL", 1.12], ["3XL", 1.16]],
@@ -43,7 +54,7 @@
   function catName(c) { for (var i = 0; i < CATS.length; i++) if (CATS[i][0] === c) return CATS[i][1]; return ""; }
   function item(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === id) return ITEMS[i]; }
   function kind(it) { return it.cat === "denim" ? "bottom" : "top"; }
-  function pic(it, cls) { var im = el("img", cls); im.src = "img/" + it.id + ".webp"; im.alt = ""; im.decoding = "async"; return im; }
+  function pic(it, cls) { var im = el("img", cls); im.src = "img/" + it.id + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
 
   document.addEventListener("DOMContentLoaded", function () {
     var grid = $("grid"), cats = $("cats"), floor = $("floor"), hall = $("hall"), ui = {}, size = { top: "M", bottom: "32" }, booted = false;
