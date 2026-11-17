@@ -10,7 +10,7 @@ import { RoomEnvironment } from './lib/RoomEnvironment.js';
 const VZ = window.VZ, $ = (id) => document.getElementById(id);
 const canvas = $('fit'), stage = $('stage');
 const { degToRad: rad, radToDeg: deg, clamp, lerp } = THREE.MathUtils;
-const say = (text) => { $('fit-note').textContent = text; };
+const say = (text) => { $('fit-note').textContent = window.T(text); };   // lang.js: English or Spanish
 
 /* Measured on the models, in metres. Each mannequin is 0.98 tall, centred on the origin, faces +X, arms along z. */
 const FEET = -0.49;

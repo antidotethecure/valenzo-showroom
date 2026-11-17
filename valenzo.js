@@ -1,10 +1,11 @@
 /* Valenzo Studio showroom: the floor of dressed mannequins, collection cards that light up, the mix-and-match fitting room (3D in fit.js), opening sequence.
-   No storage, no network calls beyond this folder's own images/models. */
+   No network calls beyond this folder's own images/models. Every word shown goes through T() (lang.js), so the page reads in English or Spanish. */
 (function () {
   "use strict";
-  var root = document.documentElement;
-  var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!calm) root.classList.add("intro-on");           // set before first paint so the door film covers the store
+  var root = document.documentElement, T = window.T;
+  var calm = matchMedia("(prefers-reduced-motion: reduce)").matches, back = false;
+  try { back = sessionStorage.getItem("vz_back"); sessionStorage.removeItem("vz_back"); } catch (e) {}   // left by the language switch, which reloads the page: the doors do not replay
+  if (!calm && !back) root.classList.add("intro-on");  // set before first paint so the door film covers the store
 
   var CATS = [["all", "All"], ["crystal", "Crystal"], ["print", "Prints"], ["denim", "Denim"], ["polo", "Polos"]];
   var ITEMS = [
@@ -46,24 +47,38 @@
     ["rh_white", "vdm07", 17.2, 73.4, 43.6], ["pr_navy", "bc_blue", 28.7, 64.8, 23.4], ["pr_sage", "vdm07", 34.1, 60.7, 17.2], ["rh_black", "bc_blue", 37.9, 58.7, 12.2],
     ["rh_white", "bc_ice", 62.1, 58.7, 12.2], ["pr_blue", "bc_black", 65.9, 60.7, 17.2], ["pr_cream", "bc_black", 71.4, 64.8, 23.4], ["rh_black", "bc_ice", 82.7, 73.4, 43.6]
   ];
+  /* the floor shows every shirt in turn: the 8 opening outfits, then each long sleeve and each polo, in the jeans its mannequin picture (img/on-<shirt>-<jeans>.webp) was made with */
+  var LOOKS = HALL.map(function (h) { return [h[0], h[1]]; });
+  ["vpl", "vps"].forEach(function (k) {
+    ITEMS.map(function (it) { return it.id; }).filter(function (id) { return id.indexOf(k) === 0; }).sort()
+      .forEach(function (id, i) { LOOKS.push([id, ["vdm07", "bc_blue", "bc_black", "bc_ice"][i % 4]]); });
+  });
+  /* names, colours and descriptions in the visitor's language; a style number (VPL15) stays as it is */
+  ITEMS.forEach(function (it) {
+    it.name = it.name.replace(/^(V[A-Z]+\d+ )?(.+)$/, function (all, code, words) { return (code || "") + T(words); });
+    it.tone = it.tone.split(" · ").map(T).join(" · ");
+    if (it.desc) it.desc = T(it.desc);
+  });
   /* shared with fit.js, the 3D fitting room, which is only fetched once somebody heads for it */
   var VZ = window.VZ = { calm: calm, look: { top: "rh_white", bottom: "vdm07" }, girth: 1 };
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
-  function catName(c) { for (var i = 0; i < CATS.length; i++) if (CATS[i][0] === c) return CATS[i][1]; return ""; }
+  function catName(c) { for (var i = 0; i < CATS.length; i++) if (CATS[i][0] === c) return T(CATS[i][1]); return ""; }
+  function full(it) { return it.name + T(" in ") + it.tone; }
   function item(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === id) return ITEMS[i]; }
   function kind(it) { return it.cat === "denim" ? "bottom" : "top"; }
   function pic(it, cls) { var im = el("img", cls); im.src = "img/" + it.id + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
 
   document.addEventListener("DOMContentLoaded", function () {
     var grid = $("grid"), cats = $("cats"), floor = $("floor"), hall = $("hall"), ui = {}, size = { top: "M", bottom: "32" }, booted = false;
+    var touch = matchMedia("(hover: none)").matches;
 
     /* ---- fitting room: a shirt and a pair of jeans, each with its own picker, sizes and price ---- */
     function boot() {
       if (booted) return;
       booted = true;
-      var s = el("script"); s.type = "module"; s.src = "fit.js?v=3"; document.head.appendChild(s);
+      var s = el("script"); s.type = "module"; s.src = "fit.js?v=4"; document.head.appendChild(s);
     }
     function mark(box, attr, hit) {
       [].forEach.call(box.children, function (b) { if (hit(b)) b.setAttribute(attr, "true"); else if (attr === "aria-pressed") b.setAttribute(attr, "false"); else b.removeAttribute(attr); });
@@ -73,17 +88,17 @@
       ["top", "bottom"].forEach(function (k) {
         var it = item(VZ.look[k]), u = ui[k];
         u.name.textContent = it.name; u.tone.textContent = it.tone; u.desc.textContent = it.desc;
-        u.price.textContent = it.price ? "$" + it.price.toFixed(2) : "Price on TikTok Shop";
+        u.price.textContent = it.price ? "$" + it.price.toFixed(2) : T("Price on TikTok Shop");
         priced = priced && !!it.price; total += it.price || 0;
         mark(u.rail, "aria-current", function (b) { return b.dataset.id === it.id; });
         mark(u.sizes, "aria-pressed", function (b) { return b.textContent === size[k]; });
         SIZES[k].forEach(function (s) { if (s[0] === size[k]) girth += s[1] / 2; });
-        worn.push(it.name + " in " + it.tone);
+        worn.push(full(it));
       });
       VZ.girth = girth;                                                  // fit.js grows or slims the mannequin to match
-      $("p-total").textContent = priced ? "Outfit total $" + total.toFixed(2) : "";
-      $("p-fit").textContent = "Mannequin shown in shirt size " + size.top + " and waist " + size.bottom + ".";
-      $("fit").setAttribute("aria-label", "3D mannequin wearing the " + worn.join(" with the ") + ". Drag to turn it.");
+      $("p-total").textContent = priced ? T("Outfit total $") + total.toFixed(2) : "";
+      $("p-fit").textContent = T("Mannequin shown in shirt size {0} and waist {1}.").replace("{0}", size.top).replace("{1}", size.bottom);
+      $("fit").setAttribute("aria-label", T("3D mannequin wearing") + ": " + worn.join(", ") + ". " + T("Drag to turn it."));
     }
     function wear(look, reset, go) {
       for (var k in look) VZ.look[k] = look[k];
@@ -96,14 +111,14 @@
     ["top", "bottom"].forEach(function (k) {
       var box = el("div", "piece"), head = el("p", "what"), u = ui[k] = { name: el("span", "name"), tone: el("span", "tone"), desc: el("p", "desc"), price: el("p", "price"), rail: el("div", "rail " + k), sizes: el("div", "sizes") };
       head.appendChild(u.name); head.appendChild(u.tone);
-      u.rail.setAttribute("role", "group"); u.rail.setAttribute("aria-label", "Choose the " + KIND[k].toLowerCase());
-      u.sizes.setAttribute("role", "group"); u.sizes.setAttribute("aria-label", KIND[k] + " size");
+      u.rail.setAttribute("role", "group"); u.rail.setAttribute("aria-label", T("Choose the " + KIND[k].toLowerCase()));
+      u.sizes.setAttribute("role", "group"); u.sizes.setAttribute("aria-label", T(KIND[k] + " size"));
       SIZES[k].forEach(function (s) {
         var b = el("button", "", s[0]); b.type = "button";
         b.addEventListener("click", function () { size[k] = s[0]; paint(); });
         u.sizes.appendChild(b);
       });
-      [el("p", "cat", KIND[k]), head, u.price, u.desc, u.rail, u.sizes].forEach(function (n) { box.appendChild(n); });
+      [el("p", "cat", T(KIND[k])), head, u.price, u.desc, u.rail, u.sizes].forEach(function (n) { box.appendChild(n); });
       $("pieces").appendChild(box);
     });
 
@@ -111,10 +126,10 @@
     ITEMS.forEach(function (it) {
       var li = el("li"), b = el(it.flat ? "div" : "button", it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
       b.type = "button"; im.loading = "lazy";
-      im.alt = it.name + " in " + it.tone + (it.flat ? "" : " on a display mannequin");
+      im.alt = full(it) + (it.flat ? "" : T(" on a display mannequin"));
       n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
       m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
-      b.appendChild(n); b.appendChild(m); li.appendChild(b); li.dataset.cat = it.cat; grid.appendChild(li);
+      b.appendChild(n); b.appendChild(m); li.appendChild(b); li.dataset.cat = it.cat; li.id = "c-" + it.id; grid.appendChild(li);
       if (it.flat) return;
       b.addEventListener("click", function () { wear(one(it), true, true); });
 
@@ -124,7 +139,7 @@
     paint();
 
     CATS.forEach(function (c, i) {
-      var b = el("button", "", c[1]); b.type = "button"; b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      var b = el("button", "", T(c[1])); b.type = "button"; b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
       b.addEventListener("click", function () {
         [].forEach.call(cats.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
         [].forEach.call(grid.children, function (li) { li.hidden = c[0] !== "all" && li.dataset.cat !== c[0]; });
@@ -132,20 +147,30 @@
       cats.appendChild(b);
     });
 
-    /* ---- the floor: a dressed mannequin on every plinth; picking one takes that outfit to the fitting room ---- */
+    /* ---- the floor: a dressed mannequin on every plinth; picking one takes that outfit to the fitting room, or to its card when the shirt is a photo with no 3D model ---- */
     var men = [], turn = 0;
+    function due(m, n) { return LOOKS[(m.at + (turn + n) * HALL.length) % LOOKS.length]; }   // each change brings on the next 8 outfits
+    function src(o) { return "img/on-" + o[0] + "-" + o[1] + ".webp"; }
     function dress(m) {
-      var o = HALL[(m.at + turn) % HALL.length], t = item(o[0]), j = item(o[1]);
+      var o = due(m, 0), t = item(o[0]);
       m.look = { top: o[0], bottom: o[1] };
-      m.im.src = "img/on-" + o[0] + "-" + o[1] + ".webp";
-      m.im.alt = t.name + " in " + t.tone + " with " + j.name + " in " + j.tone + ". Try this outfit on.";
+      m.im.src = src(o);
+      m.im.alt = full(t) + T(" with ") + full(item(o[1])) + ". " + T(t.flat ? "See this shirt in the collection." : "Try this outfit on.");
     }
+    function ahead() { men.forEach(function (m) { new Image().src = src(due(m, 1)); }); }   // fetch the next outfits early, so the fade lands on a finished picture
     HALL.forEach(function (h, i) {
       var b = el("button", "man"), m = { b: b, im: el("img"), at: i };
       b.type = "button"; b.style.left = h[2] + "%"; b.style.top = (h[3] - h[4]) + "%"; b.style.height = h[4] + "%";
       m.im.decoding = "async"; dress(m);
       b.appendChild(m.im); hall.appendChild(b); men.push(m);
-      b.addEventListener("click", function () { wear(m.look, true, true); });
+      b.addEventListener("click", function () {
+        if (!item(m.look.top).flat) return wear(m.look, true, true);
+        var c = $("c-" + m.look.top);
+        cats.firstChild.click();                           // back to "All", in case the filter is hiding this shirt
+        c.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" });
+        c.tabIndex = -1; c.focus({ preventScroll: true });
+        if (!touch) { c.firstChild.classList.add("lit"); setTimeout(function () { c.firstChild.classList.remove("lit"); }, 6000); }   // phones already light whatever is mid-screen
+      });
     });
     /* the floor changes clothes: every 10 s each mannequin steps into the next outfit. The one under a pointer or
        keyboard focus waits, so an outfit never changes as somebody picks it. Started by the doors opening (never for reduced motion). */
@@ -157,6 +182,7 @@
         m.b.classList.add("swap");
         setTimeout(function () { dress(m); m.b.classList.remove("swap"); }, 450);
       });
+      ahead();
     }
     /* narrow screens walk the floor sideways */
     var strip = matchMedia("(max-aspect-ratio: 13/10)");
@@ -165,7 +191,7 @@
 
     if ("IntersectionObserver" in window) {
       /* phones have no hover: the light comes up on whatever is in the middle of the screen */
-      if (matchMedia("(hover: none)").matches) {
+      if (touch) {
         var lamp = new IntersectionObserver(function (es) {
           es.forEach(function (e) { e.target.classList.toggle("lit", e.isIntersecting); });
         }, { rootMargin: "-36% 0px -36% 0px" });
@@ -194,10 +220,12 @@
     function open() {
       if (root.classList.contains("open")) return;
       root.classList.add("open");
-      setInterval(change, 10000);
+      setInterval(change, 10000); ahead(); hush();
       setTimeout(function () { if (intro.parentNode) intro.parentNode.removeChild(intro); }, 1100);
     }
-    if (calm) intro.parentNode.removeChild(intro);
+    function hush() { setTimeout(function () { $("lang-tip").hidden = true; }, 15000); }   // the "change the language here" bubble steps aside after 15 s in the store
+    if (calm) { intro.parentNode.removeChild(intro); hush(); }
+    else if (back) open();
     else {
       var doors = $("doors"), play;
       $("skip").addEventListener("click", open);

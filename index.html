@@ -14,8 +14,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="valenzo.css?v=6">
-<script src="valenzo.js?v=6"></script>
+<link rel="stylesheet" href="valenzo.css?v=7">
+<script src="lang.js?v=1"></script>
+<script src="valenzo.js?v=7"></script>
 </head>
 <body>
 
@@ -25,14 +26,20 @@
 </div>
 
 <nav class="bar" aria-label="Site">
-  <a class="brand" href="#top"><img class="emblem" src="img/emblem.webp" alt="" width="192" height="192"><span>Valenzo</span></a>
+  <a class="brand" href="#top" aria-label="Valenzo"><img class="emblem" src="img/emblem.webp" alt="" width="192" height="192"><span>Valenzo</span></a>
   <span class="links">
     <a href="#collection">Collection</a>
     <a href="#fitting-room">Fitting Room</a>
     <a href="#studio">Studio</a>
     <a href="#wholesale">Wholesale</a>
   </span>
-  <a class="btn gold small" href="https://www.tiktok.com/@valenzostudio" target="_blank" rel="noopener noreferrer">Shop on TikTok</a>
+  <span class="bar-end">
+    <span class="langbox">
+      <button class="lang" id="lang" type="button" aria-label="Cambiar a español"><span>EN</span><span>ES</span></button>
+      <button class="tip" id="lang-tip" type="button" lang="es" hidden>¿Español? Toca aquí<small lang="en">Change the language here</small></button>
+    </span>
+    <a class="btn gold small" href="https://www.tiktok.com/@valenzostudio" target="_blank" rel="noopener noreferrer">Shop on TikTok</a>
+  </span>
 </nav>
 
 <header class="hero" id="top">
@@ -43,7 +50,7 @@
     <h1>Valenzo Studio</h1>
     <div>
       <p class="lede">Western style, elevated.</p>
-      <p class="hint"><span class="pick">Choose a mannequin to try its outfit on</span><span class="walk">Swipe to walk the floor &middot; tap a mannequin to try it on</span></p>
+      <p class="hint"><span class="pick">Choose a mannequin to see its outfit</span><span class="walk">Swipe to walk the floor &middot; tap a mannequin to see its outfit</span></p>
       <p class="actions">
         <a class="btn gold" href="#collection">Enter the collection</a>
         <a class="btn line" href="#fitting-room">Step into the fitting room</a>
@@ -134,8 +141,9 @@
 
 <footer class="foot">
   <p>&copy; Valenzo Studio &middot; Los Angeles, CA</p>
-  <p class="fine">Preview site. Garments are shown as 3D digital renderings made from Valenzo Studio's own videos. Final names, sizes and prices are on the TikTok Shop.</p>
+  <p class="fine">Preview site. Garments are shown as digital renderings made from Valenzo Studio's own videos and photos. Final names, sizes and prices are on the TikTok Shop.</p>
 </footer>
+<script src="faqbot.js?v=1" defer></script>
 <script src="poweredby.js?v=20261013a" defer></script>
 </body>
 </html>
