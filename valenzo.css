@@ -44,7 +44,8 @@ p { margin: 0 0 1em; }
 .sign::before { content: ""; position: absolute; inset: -20% -16%; background: radial-gradient(ellipse closest-side, rgba(255, 252, 240, .95), rgba(255, 244, 214, .6) 52%, transparent); }
 .sign img { position: relative; display: block; width: 100%; height: auto; filter: drop-shadow(0 .14vh .1vh rgba(60, 38, 8, .6)) drop-shadow(0 0 .4vh #fff) drop-shadow(0 0 1.6vh rgba(255, 248, 226, .95)); }
 .man { position: absolute; aspect-ratio: 2 / 5; padding: 0; border: 0; background: none; cursor: pointer; transform: translateX(-50%); filter: brightness(.93); transition: filter .8s cubic-bezier(.2, .9, .3, 1); }
-.man img { width: 100%; height: 100%; }
+.man img { width: 100%; height: 100%; transition: opacity .45s; }
+.man.swap img { opacity: 0; }
 .man::before { content: ""; position: absolute; left: -70%; right: -70%; top: -40%; bottom: -5%; pointer-events: none; opacity: 0; transition: opacity .8s; background: radial-gradient(ellipse 30% 52% at 50% 36%, rgba(255, 233, 180, .3), transparent 72%), radial-gradient(ellipse 34% 4% at 50% 95.5%, rgba(255, 226, 160, .6), transparent 70%); }
 .man::after { content: ""; position: absolute; z-index: -1; left: 4%; right: 4%; bottom: -1.6%; height: 5%; background: radial-gradient(ellipse at center, rgba(0, 0, 0, .8), transparent 68%); }
 .man:hover, .man:focus-visible, .man.lit { filter: brightness(1.1) drop-shadow(0 0 26px rgba(255, 226, 160, .8)); }

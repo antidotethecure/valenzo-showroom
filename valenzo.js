@@ -133,14 +133,31 @@
     });
 
     /* ---- the floor: a dressed mannequin on every plinth; picking one takes that outfit to the fitting room ---- */
-    HALL.forEach(function (h) {
-      var b = el("button", "man"), im = el("img"), t = item(h[0]), j = item(h[1]);
+    var men = [], turn = 0;
+    function dress(m) {
+      var o = HALL[(m.at + turn) % HALL.length], t = item(o[0]), j = item(o[1]);
+      m.look = { top: o[0], bottom: o[1] };
+      m.im.src = "img/on-" + o[0] + "-" + o[1] + ".webp";
+      m.im.alt = t.name + " in " + t.tone + " with " + j.name + " in " + j.tone + ". Try this outfit on.";
+    }
+    HALL.forEach(function (h, i) {
+      var b = el("button", "man"), m = { b: b, im: el("img"), at: i };
       b.type = "button"; b.style.left = h[2] + "%"; b.style.top = (h[3] - h[4]) + "%"; b.style.height = h[4] + "%";
-      im.src = "img/on-" + h[0] + "-" + h[1] + ".webp"; im.decoding = "async";
-      im.alt = t.name + " in " + t.tone + " with " + j.name + " in " + j.tone + ". Try this outfit on.";
-      b.appendChild(im); hall.appendChild(b);
-      b.addEventListener("click", function () { wear({ top: h[0], bottom: h[1] }, true, true); });
+      m.im.decoding = "async"; dress(m);
+      b.appendChild(m.im); hall.appendChild(b); men.push(m);
+      b.addEventListener("click", function () { wear(m.look, true, true); });
     });
+    /* the floor changes clothes: every 10 s each mannequin steps into the next outfit. The one under a pointer or
+       keyboard focus waits, so an outfit never changes as somebody picks it. Started by the doors opening (never for reduced motion). */
+    function change() {
+      if (document.hidden) return;
+      turn++;
+      men.forEach(function (m) {
+        if (m.b.matches(":hover, :focus-visible")) return;
+        m.b.classList.add("swap");
+        setTimeout(function () { dress(m); m.b.classList.remove("swap"); }, 450);
+      });
+    }
     /* narrow screens walk the floor sideways */
     var strip = matchMedia("(max-aspect-ratio: 13/10)");
     if (strip.addEventListener) strip.addEventListener("change", function () { floor.scrollLeft = 0; });
@@ -177,6 +194,7 @@
     function open() {
       if (root.classList.contains("open")) return;
       root.classList.add("open");
+      setInterval(change, 10000);
       setTimeout(function () { if (intro.parentNode) intro.parentNode.removeChild(intro); }, 1100);
     }
     if (calm) intro.parentNode.removeChild(intro);
