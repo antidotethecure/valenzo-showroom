@@ -94,6 +94,9 @@ h2 { margin: .35em 0 .7em; font: 500 clamp(1.9rem, 4.4vw, 3.3rem)/1.12 var(--ser
 .card:hover .niche, .card:focus-visible .niche, .card.lit .niche { filter: brightness(1.06) saturate(1.04); box-shadow: 0 0 0 1px var(--gold), 0 24px 70px -18px rgba(240, 200, 120, .5); }
 .card:hover .beam, .card:focus-visible .beam, .card.lit .beam { opacity: 1; }
 .card:hover .fig, .card:focus-visible .fig, .card.lit .fig { transform: scale(1.035); }
+.card.flat { cursor: default; }
+.card.flat:hover .niche, .card.flat.lit .niche { filter: none; }   /* extra brightness washes out a white shirt on white */
+.flat .fig { object-fit: contain; background: #fefefe; }   /* studio photos on white, shown whole */
 .meta { display: block; padding: 1rem .3rem 1.4rem; }
 .cat { display: block; margin: 0; font: 400 .64rem/1.4 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
 .name { display: block; margin-top: .25rem; font: 500 1.3rem/1.2 var(--serif); }

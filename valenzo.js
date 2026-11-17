@@ -6,7 +6,7 @@
   var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!calm) root.classList.add("intro-on");           // set before first paint so the door film covers the store
 
-  var CATS = [["all", "All"], ["crystal", "Crystal"], ["print", "Prints"], ["denim", "Denim"]];
+  var CATS = [["all", "All"], ["crystal", "Crystal"], ["print", "Prints"], ["denim", "Denim"], ["polo", "Polos"]];
   var ITEMS = [
     { id: "rh_white", cat: "crystal", name: "Crystal Key Shirt", tone: "White", desc: "A crystal and stud key pattern across the whole body, with a matching band at the collar and cuffs." },
     { id: "rh_black", cat: "crystal", name: "Crystal Key Shirt", tone: "Black", desc: "The same crystal key pattern on black, with the band repeated at the collar and cuffs." },
@@ -19,6 +19,11 @@
     { id: "bc_black", cat: "denim", name: "Signature V Boot Cut", tone: "Black", desc: "Black denim with the signature V stitched in grey." },
     { id: "bc_ice", cat: "denim", name: "Signature V Boot Cut", tone: "Ice Wash", desc: "Ice wash denim with the signature V stitched in dark thread." }
   ];
+  /* the polo colours listed in the Shopify store: photo cards only, no 3D model yet, so they stay out of the fitting room */
+  [["01", "White Black"], ["05", "Black White"], ["06", "Black Grey White"], ["07", "Black Blue Khaki White"], ["08", "Black Navy White"], ["09", "Black Grey White"],
+   ["10", "Black Blue White"], ["11", "Black Brown White"], ["12", "Black Navy White"], ["13", "Black Navy White"], ["14", "Black White"]].forEach(function (p) {
+    p[1].split(" ").forEach(function (c) { ITEMS.push({ id: "vps" + p[0] + "_" + c.toLowerCase(), cat: "polo", name: "VPS" + p[0] + " Polo Shirt", tone: c, flat: true }); });
+  });
   /* shortcut: sample size run and no prices, because the shop's own listings could not be read; put the studio's real sizes here and a price (a number, in dollars) on each item when they send them */
   var SIZES = {   // [label, how much wider the mannequin stands than at the middle size]
     top: [["S", 0.96], ["M", 1], ["L", 1.04], ["XL", 1.08], ["2XL", 1.12], ["3XL", 1.16]],
@@ -93,12 +98,13 @@
 
     /* ---- collection ---- */
     ITEMS.forEach(function (it) {
-      var li = el("li"), b = el("button", "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
+      var li = el("li"), b = el(it.flat ? "div" : "button", it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
       b.type = "button"; im.loading = "lazy";
-      im.alt = it.name + " in " + it.tone + " on a display mannequin";
+      im.alt = it.name + " in " + it.tone + (it.flat ? "" : " on a display mannequin");
       n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
       m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
       b.appendChild(n); b.appendChild(m); li.appendChild(b); li.dataset.cat = it.cat; grid.appendChild(li);
+      if (it.flat) return;
       b.addEventListener("click", function () { wear(one(it), true, true); });
 
       var t = el("button"); t.type = "button"; t.dataset.id = it.id; t.setAttribute("aria-label", it.name + ", " + it.tone); t.appendChild(pic(it));
