@@ -61,6 +61,9 @@
     "Wholesale & Retail": "Mayoreo y Menudeo",
     "Stocking a store, or just want one piece? Message the studio directly.": "¿Surtes una tienda o solo quieres una pieza? Escríbele directo al estudio.",
     "Preview site. Garments are shown as digital renderings made from Valenzo Studio's own videos and photos. Final names, sizes and prices are on the TikTok Shop.": "Sitio de vista previa. Las prendas se muestran como renders digitales hechos a partir de los videos y las fotos de Valenzo Studio. Los nombres, tallas y precios finales están en la TikTok Shop.",
+    /* cart (cart.js) */
+    "Cart": "Carrito", "Add to cart": "Agregar al carrito", "Size": "Talla", "Checkout": "Pagar", "Subtotal $": "Subtotal $", "Your cart is empty.": "Tu carrito está vacío.",
+    "Shipping and taxes are worked out at checkout.": "El envío y los impuestos se calculan al pagar.", "One less": "Quitar uno", "One more": "Agregar uno",
     /* "May I help you?" (faqbot.js); its questions and answers live in faq.json */
     "May I help you?": "¿Te puedo ayudar?", "Answers right away": "Respuestas al instante", "Close": "Cerrar", "Ask me anything…": "Pregúntame lo que sea…",
     "Question": "Pregunta", "Ask": "Preguntar",
