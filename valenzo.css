@@ -95,7 +95,6 @@ h2 { margin: .35em 0 .7em; font: 500 clamp(1.9rem, 4.4vw, 3.3rem)/1.12 var(--ser
 .card:hover .niche, .card:focus-visible .niche, .card.lit .niche { filter: brightness(1.06) saturate(1.04); box-shadow: 0 0 0 1px var(--gold), 0 24px 70px -18px rgba(240, 200, 120, .5); }
 .card:hover .beam, .card:focus-visible .beam, .card.lit .beam { opacity: 1; }
 .card:hover .fig, .card:focus-visible .fig, .card.lit .fig { transform: scale(1.035); }
-.card.flat { cursor: default; }
 .flat .fig { top: 10%; height: 70%; object-fit: contain; object-position: 50% 100%; transform-origin: 50% 100%; }   /* img/on-*.webp are cropped to the figure: stand its base plate on the plinth, at the size of the other mannequins */
 .meta { display: block; padding: 1rem .3rem 1.4rem; }
 .cat { display: block; margin: 0; font: 400 .64rem/1.4 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
@@ -239,6 +238,15 @@ button.btn { cursor: pointer; }
 .ct .total { margin: 1rem 0 .4rem; }
 .ct .btn { margin-top: .9rem; }
 .ct .btn[hidden] { display: none; }
+
+/* ---- details sheet (valenzo.js): one card or one floor mannequin, on the cart's sheet ---- */
+.meta .price { display: block; }
+li:has(.buy) .meta .price { display: none; }   /* the store is open: cart.js shows the live price under the card instead */
+.pd img { display: block; width: auto; max-width: 100%; height: min(42vh, 400px); margin: .9rem auto 0; object-fit: contain; }
+.pd .cat { margin-top: 1.2rem; }
+.pd .what, .pd .price, .pd .desc { padding: 0 1.1rem; }
+.pd .price:empty { display: none; }
+.pd .desc { margin-inline: auto; font-size: .93rem; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

@@ -36,7 +36,48 @@
    ["denim", "VMD05 Denim Jeans", "Black \u00b7 Front,Black \u00b7 Back"]].forEach(function (p) {
     p[2].split(",").forEach(function (c) { ITEMS.push({ id: (p[1].split(" ")[0] + "_" + c).toLowerCase().replace(/[^a-z0-9]+/g, "_"), cat: p[0], name: p[1], tone: c, flat: true }); });
   });
-  /* shortcut: sample size run and no prices, because the shop's own listings could not be read; put the studio's real sizes here and a price (a number, in dollars) on each item when they send them */
+  /* what each photo-set style looks like, by style number; every colour of a style shares it. The Spanish is in lang.js */
+  var DESC = {
+    vps01: "A clean polo with an embroidered crest on the chest, contrast buttons and a patterned collar.",
+    vps05: "A polo with a band of scrolls and key squares down one side, dotted sleeves and a patterned collar.",
+    vps06: "A polo with a wide key-pattern panel across the chest and a tipped collar and cuffs.",
+    vps07: "A polo crossed by a large tonal plaid.",
+    vps08: "A polo with studs scattered across the shoulders and chest, a studded collar and patterned cuffs.",
+    vps09: "A polo with a textured geometric panel across the shoulders and fine lines crossing the body.",
+    vps10: "A polo with stud diamonds across the body, a key-pattern stripe down the front and key-pattern collar and cuffs.",
+    vps11: "A polo with a patterned knit panel across the chest, a plaid accent and a striped collar.",
+    vps12: "A plain polo with a small embroidered bee on the chest and stripes at the collar and cuffs.",
+    vps13: "A polo with fine stripes that cross into a plaid on the front.",
+    vps14: "A polo with a windowpane line pattern and a striped band across the chest and cuffs.",
+    vpl15: "Baroque scrollwork and a key border across the chest, finished with studs.",
+    vpl16: "A maze pattern outlined in studs over the whole shirt, with key-pattern collar and cuffs.",
+    vpl18: "Two bold key-pattern stripes down the front with lines of studs between them, and a key-pattern collar.",
+    vpl19: "Stud diamonds across the chest with lines of studs running down the body.",
+    vpl20: "A small all-over geometric print with a brushed, worn-in finish.",
+    vpl21: "An all-over geometric tile print set in rows.",
+    vpl22: "A small all-over floral print in soft tones.",
+    vpl23: "Key-pattern stripes alternating with baroque scrollwork from collar to hem.",
+    vpl24: "An all-over floral and scroll print.",
+    vpl25: "An all-over painted print with a brushed marble look.",
+    vpl26: "A tonal all-over print of key squares and paisley.",
+    vpl27: "Bold baroque leaves over a small key-pattern ground.",
+    vpl28: "A diamond lattice print with brushed streaks across it.",
+    vdm03: "Boot cut jeans with a V stitched on each back pocket under a studded band.",
+    vdm05: "Boot cut jeans with layered V embroidery on the back pockets and heavy contrast stitching.",
+    vdm06: "Boot cut jeans with a wide flare and bold geometric V embroidery on the back pockets.",
+    vdm08: "Light wash boot cut jeans with heavy contrast stitching and whiskered fading.",
+    vmd05: "Boot cut jeans with tonal V stitching on the back pockets."
+  };
+  /* shortcut: these prices were copied by hand from the Shopify store on 2026-11-18 and are shown while that store is still closed;
+     once it opens, cart.js puts Shopify's live price on the card and in the details sheet, and this list can go */
+  ITEMS.forEach(function (it) {
+    if (!it.flat) return;
+    var code = it.id.split("_")[0];
+    it.desc = DESC[code];
+    it.price = /^(vdm|vmd)/.test(code) ? 79.99 : /^(vpl1[5689]|vps08|vps10)$/.test(code) ? 69.99 : 49.99;
+  });
+  console.assert(ITEMS.every(function (it) { return !it.flat || (it.desc && it.price > 0); }) && item("vpl15_red").price === 69.99 && item("vps12_navy").price === 49.99 && item("vmd05_black_back").price === 79.99, "photo-set piece without a description or with the wrong price");
+  /* shortcut: sample size run, and no prices on the ten 3D pieces, because the studio has not sent them; put the real sizes here and a price (a number, in dollars) on each of those items when they do */
   var SIZES = {   // [label, how much wider the mannequin stands than at the middle size]
     top: [["S", 0.96], ["M", 1], ["L", 1.04], ["XL", 1.08], ["2XL", 1.12], ["3XL", 1.16]],
     bottom: [["28", 0.94], ["30", 0.97], ["32", 1], ["34", 1.03], ["36", 1.06], ["38", 1.09], ["40", 1.12], ["42", 1.15]]
@@ -111,6 +152,27 @@
     }
     function one(it) { var look = {}; look[kind(it)] = it.id; return look; }
 
+    /* ---- details: picking a card or a floor mannequin opens one sheet with its picture and, for each piece it shows, the price and the description ---- */
+    var pd = el("dialog", "ct pd"), pdHd = el("div", "fq-hd"), pdX = el("button", "fq-x", "\u00d7"), pdIm = el("img"), pdBody = el("div"), pdTry = el("button", "btn gold", T("Try it on")), pdLook;
+    pd.setAttribute("aria-label", T("Details")); pdX.type = pdTry.type = "button"; pdX.setAttribute("aria-label", T("Close"));
+    pdX.addEventListener("click", function () { pd.close(); });
+    pdTry.addEventListener("click", function () { pd.close(); wear(pdLook, true, true); });
+    pdHd.appendChild(el("b", "", T("Details"))); pdHd.appendChild(pdX);
+    [pdHd, pdIm, pdBody, pdTry].forEach(function (n) { pd.appendChild(n); });
+    document.body.appendChild(pd);
+    function detail(its, src) {
+      pdBody.textContent = ""; pdLook = {};
+      its.forEach(function (it) {
+        var live = $("c-" + it.id).querySelector(".buy .price"), head = el("p", "what");   // the store's own price, once cart.js has it
+        head.appendChild(el("span", "name", it.name)); head.appendChild(el("span", "tone", it.tone));
+        [el("p", "cat", catName(it.cat)), head, el("p", "price", live ? live.textContent : it.price ? "$" + it.price.toFixed(2) : ""), el("p", "desc", it.desc)].forEach(function (n) { pdBody.appendChild(n); });
+        pdLook[kind(it)] = it.id;
+      });
+      pdTry.hidden = its.some(function (it) { return it.flat; });   // only the 3D pieces can go to the fitting room
+      pdIm.src = src; pdIm.alt = its.map(full).join(T(" with "));
+      pd.showModal();
+    }
+
     ["top", "bottom"].forEach(function (k) {
       var box = el("div", "piece"), head = el("p", "what"), u = ui[k] = { name: el("span", "name"), tone: el("span", "tone"), desc: el("p", "desc"), price: el("p", "price"), rail: el("div", "rail " + k), sizes: el("div", "sizes") };
       head.appendChild(u.name); head.appendChild(u.tone);
@@ -127,14 +189,15 @@
 
     /* ---- collection ---- */
     ITEMS.forEach(function (it) {
-      var li = el("li"), b = el(it.flat ? "div" : "button", it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
+      var li = el("li"), b = el("button", it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
       b.type = "button"; im.loading = "lazy";
       im.alt = full(it) + T(" on a display mannequin");
       n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
       m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
+      if (it.price) m.appendChild(el("span", "price", "$" + it.price.toFixed(2)));
       b.appendChild(n); b.appendChild(m); li.appendChild(b); li.dataset.cat = it.cat; li.id = "c-" + it.id; grid.appendChild(li);
+      b.addEventListener("click", function () { detail([it], im.src); });
       if (it.flat) return;
-      b.addEventListener("click", function () { wear(one(it), true, true); });
 
       var t = el("button"); t.type = "button"; t.dataset.id = it.id; t.setAttribute("aria-label", it.name + ", " + it.tone); t.appendChild(pic(it));
       t.addEventListener("click", function () { wear(one(it), false, false); }); ui[kind(it)].rail.appendChild(t);
@@ -150,15 +213,15 @@
       cats.appendChild(b);
     });
 
-    /* ---- the floor: a dressed mannequin on every plinth; picking one takes that outfit to the fitting room, or to its card when the shirt is a photo with no 3D model ---- */
+    /* ---- the floor: a dressed mannequin on every plinth; picking one opens the details of the shirt and jeans it wears ---- */
     var men = [], turn = 0;
     function due(m, n) { return LOOKS[(m.at + (turn + n) * HALL.length) % LOOKS.length]; }   // each change brings on the next 8 outfits
     function src(o) { return "img/on-" + o[0] + "-" + o[1] + ".webp"; }
     function dress(m) {
-      var o = due(m, 0), t = item(o[0]);
+      var o = due(m, 0);
       m.look = { top: o[0], bottom: o[1] };
       m.im.src = src(o);
-      m.im.alt = full(t) + T(" with ") + full(item(o[1])) + ". " + T(t.flat ? "See this shirt in the collection." : "Try this outfit on.");
+      m.im.alt = full(item(o[0])) + T(" with ") + full(item(o[1])) + ". " + T("See the details.");
     }
     function ahead() { men.forEach(function (m) { new Image().src = src(due(m, 1)); }); }   // fetch the next outfits early, so the fade lands on a finished picture
     HALL.forEach(function (h, i) {
@@ -166,14 +229,7 @@
       b.type = "button"; b.style.left = h[2] + "%"; b.style.top = (h[3] - h[4]) + "%"; b.style.height = h[4] + "%";
       m.im.decoding = "async"; dress(m);
       b.appendChild(m.im); hall.appendChild(b); men.push(m);
-      b.addEventListener("click", function () {
-        if (!item(m.look.top).flat) return wear(m.look, true, true);
-        var c = $("c-" + m.look.top);
-        cats.firstChild.click();                           // back to "All", in case the filter is hiding this shirt
-        c.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" });
-        c.tabIndex = -1; c.focus({ preventScroll: true });
-        if (!touch) { c.firstChild.classList.add("lit"); setTimeout(function () { c.firstChild.classList.remove("lit"); }, 6000); }   // phones already light whatever is mid-screen
-      });
+      b.addEventListener("click", function () { detail([item(m.look.top), item(m.look.bottom)], m.im.src); });
     });
     /* the floor changes clothes: every 10 s each mannequin steps into the next outfit. The one under a pointer or
        keyboard focus waits, so an outfit never changes as somebody picks it. Started by the doors opening (never for reduced motion). */
