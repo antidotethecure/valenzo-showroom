@@ -2,10 +2,10 @@
    No network calls beyond this folder's own images/models. Every word shown goes through T() (lang.js), so the page reads in English or Spanish. */
 (function () {
   "use strict";
-  var root = document.documentElement, T = window.T;
+  var root = document.documentElement, T = window.T, pp = root.classList.contains("pp");   // pp: product.html, which loads this file for the list of pieces and the card, not for the store floor
   var calm = matchMedia("(prefers-reduced-motion: reduce)").matches, back = false;
   try { back = sessionStorage.getItem("vz_back"); sessionStorage.removeItem("vz_back"); } catch (e) {}   // left by the language switch, which reloads the page: the doors do not replay
-  if (!calm && !back) root.classList.add("intro-on");  // set before first paint so the door film covers the store
+  if (!calm && !back && !pp) root.classList.add("intro-on");  // set before first paint so the door film covers the store
 
   var CATS = [["all", "All"], ["crystal", "Crystal"], ["print", "Prints"], ["denim", "Denim"], ["polo", "Polos"]];
   var ITEMS = [
@@ -37,11 +37,11 @@
     p[2].split(",").forEach(function (c) { ITEMS.push({ id: (p[1].split(" ")[0] + "_" + c).toLowerCase().replace(/[^a-z0-9]+/g, "_"), cat: p[0], name: p[1], tone: c, flat: true }); });
   });
   /* long sleeve shirts from the studio's 11-20 photo set.
-     shortcut: photo: true = the card shows the studio photo (img/<id>.webp), the piece stays off the showroom floor and has no price,
-     because its mannequin picture is not made and the studio has not sent a price; add the piece to the list above when both exist */
-  [["VPL29", "Beige,Grey,Navy"], ["VPL30", "Beige,Black,Blue,Red"], ["VPL31", "Brown,Navy,Red,White"], ["VPL33", "Black,Green,Khaki,White"],
-   ["VPL34", "Beige,Blue,Burgundy,Grey"], ["VPL35", "Beige,Black"], ["VPL36", "Beige,Black,Khaki"], ["VPL37", "Black,Blue,Red,White"],
-   ["VPL38", "Beige,Black,Burgundy,Navy"], ["VPL39", "Black,Blue,Burgundy"], ["VPL40", "Black,Burgundy"]].forEach(function (p) {
+     shortcut: photo: true = the card shows the studio photo (img/<id>.webp) and the piece stays off the showroom floor,
+     because its mannequin picture is not made; add the piece to the list above when it is */
+  [["VPL29", "Beige,Grey,Navy"], ["VPL30", "Beige,Black,Blue,Red"], ["VPL31", "Black,Brown,Navy,Red,White"], ["VPL32", "Beige,Black,Brown,Olive,White"], ["VPL33", "Black,Green,Khaki,White"],
+   ["VPL34", "Beige,Blue,Burgundy,Grey"], ["VPL35", "Beige,Black,Burgundy,Navy"], ["VPL36", "Beige,Black,Khaki"], ["VPL37", "Black,Blue,Red,White"],
+   ["VPL38", "Beige,Black,Burgundy,Navy"], ["VPL39", "Black,Blue,Burgundy,White"], ["VPL40", "Black,Burgundy"]].forEach(function (p) {
     p[1].split(",").forEach(function (c) { ITEMS.push({ id: (p[0] + "_" + c).toLowerCase(), cat: "print", name: p[0] + " Long Sleeve Shirt", tone: c, flat: true, photo: true }); });
   });
   /* what each photo-set style looks like, by style number; every colour of a style shares it. The Spanish is in lang.js */
@@ -73,6 +73,7 @@
     vpl29: "A plaid of bold crossing bands with fine coloured lines.",
     vpl30: "A wavy tiger-stripe print with silver streaks through it.",
     vpl31: "Vertical brushed streaks in mixed tones from collar to hem.",
+    vpl32: "A quilted diamond pattern with small emblems across the whole body.",
     vpl33: "A small flower motif repeated in a grid, edge to edge.",
     vpl34: "Round lion medallions and diagonal chain bands over a key-pattern ground.",
     vpl35: "Baroque scrolls and chain links over a key-pattern ground.",
@@ -87,15 +88,15 @@
     vdm08: "Light wash boot cut jeans with heavy contrast stitching and whiskered fading.",
     vmd05: "Boot cut jeans with tonal V stitching on the back pockets."
   };
-  /* shortcut: these prices were copied by hand from the Shopify store on 2026-11-18 and are shown while that store is still closed;
-     once it opens, cart.js puts Shopify's live price on the card and in the details sheet, and this list can go */
+  /* shortcut: prices kept by hand (the older styles copied from the Shopify store on 2026-11-18; VPL29 and up from the studio's 2026-11-20 message:
+     $49.99 for VPL29-VPL36, $59.99 for VPL37 and above) and used while that store is closed; once it sells, cart.js shows Shopify's live price and this list can go */
   ITEMS.forEach(function (it) {
     if (!it.flat) return;
     var code = it.id.split("_")[0];
     it.desc = DESC[code];
-    if (!it.photo) it.price = /^(vdm|vmd)/.test(code) ? 79.99 : /^(vpl1[5689]|vps08|vps10)$/.test(code) ? 69.99 : 49.99;
+    it.price = /^(vdm|vmd)/.test(code) ? 79.99 : /^(vpl1[5689]|vps08|vps10)$/.test(code) ? 69.99 : /^vpl(3[7-9]|[4-9]\d)$/.test(code) ? 59.99 : 49.99;
   });
-  console.assert(ITEMS.every(function (it) { return !it.flat || (it.desc && (it.photo ? !it.price : it.price > 0)); }) && item("vpl15_red").price === 69.99 && item("vps12_navy").price === 49.99 && item("vmd05_black_back").price === 79.99 && item("vpl29_grey").photo, "photo-set piece without a description or with the wrong price");
+  console.assert(ITEMS.every(function (it) { return !it.flat || (it.desc && it.price > 0); }) && item("vpl15_red").price === 69.99 && item("vps12_navy").price === 49.99 && item("vmd05_black_back").price === 79.99 && item("vpl36_khaki").price === 49.99 && item("vpl37_black").price === 59.99 && item("vpl40_burgundy").price === 59.99 && item("vpl32_olive").photo, "piece without a description or with the wrong price");
   /* shortcut: sample size run, and no prices on the ten 3D pieces, because the studio has not sent them; put the real sizes here and a price (a number, in dollars) on each of those items when they do */
   var SIZES = {   // [label, how much wider the mannequin stands than at the middle size]
     top: [["S", 0.96], ["M", 1], ["L", 1.04], ["XL", 1.08], ["2XL", 1.12], ["3XL", 1.16]],
@@ -124,6 +125,9 @@
   });
   /* shared with fit.js, the 3D fitting room, which is only fetched once somebody heads for it */
   var VZ = window.VZ = { calm: calm, look: { top: "rh_white", bottom: "vdm07" }, girth: 1 };
+  /* and with product.js and cart.js: the pieces, and how one is named, pictured and shown as a card */
+  VZ.items = ITEMS; VZ.item = item; VZ.full = full; VZ.pic = pic; VZ.catName = catName; VZ.card = card; VZ.el = el;
+  VZ.sizes = SIZES.top.map(function (s) { return s[0]; });
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
@@ -133,7 +137,20 @@
   function kind(it) { return it.cat === "denim" ? "bottom" : "top"; }
   function pic(it, cls) { var im = el("img", cls); im.src = "img/" + (it.flat && !it.photo ? WORN[it.id] || "on-" + it.id : it.id) + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
 
+  /* one piece as a collection card: a link to its own page (product.html) */
+  function card(it) {
+    var li = el("li"), a = el("a", it.photo ? "card flat photo" : it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
+    a.href = "product.html?id=" + it.id; im.loading = "lazy";
+    im.alt = full(it) + (it.photo ? "" : T(" on a display mannequin"));
+    n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
+    m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
+    if (it.price) m.appendChild(el("span", "price", "$" + it.price.toFixed(2)));
+    a.appendChild(n); a.appendChild(m); li.appendChild(a); li.dataset.cat = it.cat; li.id = "c-" + it.id;
+    return li;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    if (pp) return;
     var grid = $("grid"), cats = $("cats"), floor = $("floor"), hall = $("hall"), ui = {}, size = { top: "M", bottom: "32" }, booted = false;
     var touch = matchMedia("(hover: none)").matches;
 
@@ -171,7 +188,7 @@
     }
     function one(it) { var look = {}; look[kind(it)] = it.id; return look; }
 
-    /* ---- details: picking a card or a floor mannequin opens one sheet with its picture and, for each piece it shows, the price and the description ---- */
+    /* ---- details: picking a floor mannequin opens one sheet with its picture and, for each piece it wears, the price and the description ---- */
     var pd = el("dialog", "ct pd"), pdHd = el("div", "fq-hd"), pdX = el("button", "fq-x", "\u00d7"), pdIm = el("img"), pdBody = el("div"), pdTry = el("button", "btn gold", T("Try it on")), pdLook;
     pd.setAttribute("aria-label", T("Details")); pdX.type = pdTry.type = "button"; pdX.setAttribute("aria-label", T("Close"));
     pdX.addEventListener("click", function () { pd.close(); });
@@ -208,20 +225,15 @@
 
     /* ---- collection ---- */
     ITEMS.forEach(function (it) {
-      var li = el("li"), b = el("button", it.photo ? "card flat photo" : it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
-      b.type = "button"; im.loading = "lazy";
-      im.alt = full(it) + (it.photo ? "" : T(" on a display mannequin"));
-      n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
-      m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
-      if (it.price) m.appendChild(el("span", "price", "$" + it.price.toFixed(2)));
-      b.appendChild(n); b.appendChild(m); li.appendChild(b); li.dataset.cat = it.cat; li.id = "c-" + it.id; grid.appendChild(li);
-      b.addEventListener("click", function () { detail([it], im.src); });
+      grid.appendChild(card(it));
       if (it.flat) return;
 
       var t = el("button"); t.type = "button"; t.dataset.id = it.id; t.setAttribute("aria-label", it.name + ", " + it.tone); t.appendChild(pic(it));
       t.addEventListener("click", function () { wear(one(it), false, false); }); ui[kind(it)].rail.appendChild(t);
     });
     paint();
+    var tried = item(new URLSearchParams(location.search).get("try"));   // "Try it on" on a 3D piece's own page lands here, at #fitting-room
+    if (tried && !tried.flat) wear(one(tried), true, false);
 
     CATS.forEach(function (c, i) {
       var b = el("button", "", T(c[1])); b.type = "button"; b.setAttribute("aria-pressed", i === 0 ? "true" : "false");

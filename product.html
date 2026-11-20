@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="maison" class="pp">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'sha256-+RelOPL2W3Mu54WkKnIJjr3fInCKeIuPt8KlL3rKbyI='; font-src https://fonts.gstatic.com; img-src 'self' blob: data:; media-src 'self'; connect-src 'self' blob: data: https://shop.valenzoclothing.com; base-uri 'none'; form-action 'none'">
+<script src="frame-guard.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Valenzo Studio · Los Angeles</title>
+<meta name="description" content="Valenzo Studio, Los Angeles. Crystal shirts, painted prints, polos and signature boot cut denim. Dress the mannequin in 3D: any shirt with any denim.">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0d0a07">
+<link rel="icon" href="img/icon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="valenzo.css?v=12">
+<script src="lang.js?v=5"></script>
+<script src="valenzo.js?v=11"></script>
+</head>
+<body>
+<!-- one piece on its own page: product.html?id=<card id>. product.js fills it from the list in valenzo.js; cart.js adds the live price, sizes and "Add to cart" once the Shopify store sells the piece -->
+<nav class="bar" aria-label="Site">
+  <a class="brand" href="index.html" aria-label="Valenzo"><img class="emblem" src="img/emblem.webp" alt="" width="192" height="192"><span>Valenzo</span></a>
+  <span class="links">
+    <a href="index.html#collection">Collection</a>
+    <a href="index.html#fitting-room">Fitting Room</a>
+    <a href="index.html#studio">Studio</a>
+    <a href="index.html#wholesale">Wholesale</a>
+  </span>
+  <span class="bar-end">
+    <span class="langbox">
+      <button class="lang" id="lang" type="button" aria-label="Cambiar a español"><span>EN</span><span>ES</span></button>
+      <button class="tip" id="lang-tip" type="button" lang="es" hidden>¿Español? Toca aquí<small lang="en">Change the language here</small></button>
+    </span>
+    <a class="btn gold small" href="https://www.tiktok.com/@valenzostudio" target="_blank" rel="noopener noreferrer">Shop on TikTok</a>
+  </span>
+</nav>
+
+<main>
+<section id="piece" class="night">
+  <p class="crumb"><a href="index.html#collection">&larr; Back to the collection</a></p>
+  <div class="pp-grid">
+    <div class="card lit pp-fig" id="pp-fig"></div>
+    <div class="shots" id="pp-shots" role="group" aria-label="Colors"></div>
+    <div class="pp-info">
+      <p class="cat" id="pp-cat"></p>
+      <h1 id="pp-name"></h1>
+      <p class="tone" id="pp-tone"></p>
+      <p class="price" id="pp-price" aria-live="polite"></p>
+      <p class="desc" id="pp-desc"></p>
+      <div id="pp-buy"></div>
+      <p class="fine">Shipping and taxes are worked out at checkout.</p>
+    </div>
+  </div>
+  <noscript><p class="note">Turn on JavaScript to see this piece.</p></noscript>
+</section>
+<section id="also" class="night deep">
+  <p class="kicker">You may also like</p>
+  <ul id="more"></ul>
+</section>
+</main>
+
+<footer class="foot">
+  <p>&copy; Valenzo Studio &middot; Los Angeles, CA</p>
+  <p class="fine">Preview site. Garments are shown as digital renderings made from Valenzo Studio's own videos and photos.</p>
+</footer>
+<script src="product.js?v=1" defer></script>
+<script src="cart.js?v=2" defer></script>
+<script src="faqbot.js?v=1" defer></script>
+<script src="poweredby.js?v=20261013a" defer></script>
+</body>
+</html>

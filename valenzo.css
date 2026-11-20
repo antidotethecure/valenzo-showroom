@@ -83,10 +83,10 @@ h2 { margin: .35em 0 .7em; font: 500 clamp(1.9rem, 4.4vw, 3.3rem)/1.12 var(--ser
 #cats button, .views button, .sizes button { padding: .7em 1.4em; background: none; color: var(--ivory); border: 1px solid var(--line); border-radius: 99px; font: 400 .7rem/1 var(--sans); letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background .3s, color .3s, border-color .3s; }
 #cats button:hover, .views button:hover, .sizes button:hover { border-color: var(--gold-hi); }
 #cats button[aria-pressed="true"], .views button[aria-pressed="true"], .sizes button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1a1208; font-weight: 500; }
-#grid { list-style: none; margin: 2.6rem auto 0; padding: 0; max-width: 1560px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.7rem, 1.5vw, 1.3rem); }
-@media (min-width: 720px) { #grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+#grid, #more { list-style: none; margin: 2.6rem auto 0; padding: 0; max-width: 1560px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.7rem, 1.5vw, 1.3rem); }
+@media (min-width: 720px) { #grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } #more { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (min-width: 1180px) { #grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-.card { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: center; cursor: pointer; }
+.card { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: center; text-decoration: none; cursor: pointer; }
 .niche { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; background: #1a130c var(--alcove) center / cover; }
 .fig { position: absolute; inset: 0; width: 100%; height: 100%; }   /* cut-outs are framed exactly like the alcove photo */
 .beam { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity .8s; background: radial-gradient(ellipse 30% 62% at 50% 6%, rgba(255, 233, 180, .5), transparent 72%), radial-gradient(ellipse 34% 9% at 50% 76%, rgba(255, 226, 160, .55), transparent 70%); }
@@ -249,6 +249,44 @@ li:has(.buy) .meta .price { display: none; }   /* the store is open: cart.js sho
 .pd .what, .pd .price, .pd .desc { padding: 0 1.1rem; }
 .pd .price:empty { display: none; }
 .pd .desc { margin-inline: auto; font-size: .93rem; }
+
+/* ---- one piece on its own page (product.html, product.js): picture, the other colours beside it, then name, price, sizes and the order button ---- */
+#piece { padding-top: clamp(5.6rem, 11vw, 8rem); }
+.crumb { max-width: 1180px; margin: 0 auto 1.2rem; }
+.crumb a { color: var(--muted); font: 400 .7rem/1 var(--sans); letter-spacing: .2em; text-transform: uppercase; text-decoration: none; }
+.crumb a:hover { color: var(--gold-hi); }
+.pp-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem clamp(1.2rem, 3vw, 3rem); max-width: 1180px; margin: 0 auto; }
+.pp-fig { cursor: default; max-width: 560px; margin: 0 auto; }
+.pp-fig.lit .fig { transform: none; }
+.shots { display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; }
+.shots a { flex: none; width: 3.9rem; height: 4.9rem; overflow: hidden; background: #1d150d var(--alcove) center / cover; border: 1px solid var(--line); opacity: .7; transition: opacity .3s, border-color .3s; }
+.shots a:hover, .shots a[aria-current] { opacity: 1; border-color: var(--gold-hi); }
+.shots img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.shots .photo img { object-fit: cover; }
+.pp-info { text-align: center; }
+html.pp h1 { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal; margin: .3rem 0 0; font: 500 clamp(2rem, 4.4vw, 3rem)/1.1 var(--serif); }
+.pp-info .tone { font-size: 1.35rem; }
+.pp-info .price { margin-top: .7rem; font-size: .95rem; }
+.pp-info .desc { margin-inline: auto; }
+.pp-info .sizes { justify-content: center; margin-top: 1.4rem; }
+.pp-info .sizes button { min-height: 44px; }
+.btn.wide { display: block; width: 100%; max-width: 26rem; margin: 1rem auto 0; padding: 1.25em 1em; box-sizing: border-box; text-align: center; cursor: pointer; }
+.pp-info > .fine { margin-top: 1.2rem; color: var(--muted); }
+#also { text-align: center; padding-top: 0; }
+#also .kicker { margin-bottom: -1rem; }
+@media (min-width: 860px) {
+  .pp-grid { grid-template-columns: 4.4rem minmax(0, 1.05fr) minmax(0, .95fr); align-items: start; }
+  .pp-fig { grid-column: 2; grid-row: 1; max-width: none; margin: 0; width: 100%; }
+  .shots { grid-column: 1; grid-row: 1; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; }
+  .shots[hidden] + .pp-info, .pp-info { grid-column: 3; grid-row: 1; text-align: left; padding-top: 1rem; }
+  .pp-info .desc { margin-inline: 0; }
+  .pp-info .sizes { justify-content: flex-start; }
+  .pp-info .btn.wide, .pp-info > .fine { margin-left: 0; }
+}
+/* ---- the bag (cart.js): the cart sheet, as a drawer on the right edge ---- */
+.bag { margin: 0 0 0 auto; width: min(420px, 100vw); height: 100%; max-height: 100dvh; border-radius: 0; border-width: 0 0 0 1px; overflow-y: auto; }
+.bag[open] { animation: bag-in .35s cubic-bezier(.2, .8, .2, 1); }
+@keyframes bag-in { from { transform: translateX(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
