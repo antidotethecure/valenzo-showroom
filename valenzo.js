@@ -36,6 +36,14 @@
    ["denim", "VMD05 Denim Jeans", "Black \u00b7 Front,Black \u00b7 Back"]].forEach(function (p) {
     p[2].split(",").forEach(function (c) { ITEMS.push({ id: (p[1].split(" ")[0] + "_" + c).toLowerCase().replace(/[^a-z0-9]+/g, "_"), cat: p[0], name: p[1], tone: c, flat: true }); });
   });
+  /* long sleeve shirts from the studio's 11-20 photo set.
+     shortcut: photo: true = the card shows the studio photo (img/<id>.webp), the piece stays off the showroom floor and has no price,
+     because its mannequin picture is not made and the studio has not sent a price; add the piece to the list above when both exist */
+  [["VPL29", "Beige,Grey,Navy"], ["VPL30", "Beige,Black,Blue,Red"], ["VPL31", "Brown,Navy,Red,White"], ["VPL33", "Black,Green,Khaki,White"],
+   ["VPL34", "Beige,Blue,Burgundy,Grey"], ["VPL35", "Beige,Black"], ["VPL36", "Beige,Black,Khaki"], ["VPL37", "Black,Blue,Red,White"],
+   ["VPL38", "Beige,Black,Burgundy,Navy"], ["VPL39", "Black,Blue,Burgundy"], ["VPL40", "Black,Burgundy"]].forEach(function (p) {
+    p[1].split(",").forEach(function (c) { ITEMS.push({ id: (p[0] + "_" + c).toLowerCase(), cat: "print", name: p[0] + " Long Sleeve Shirt", tone: c, flat: true, photo: true }); });
+  });
   /* what each photo-set style looks like, by style number; every colour of a style shares it. The Spanish is in lang.js */
   var DESC = {
     vps01: "A clean polo with an embroidered crest on the chest, contrast buttons and a patterned collar.",
@@ -62,6 +70,17 @@
     vpl26: "A tonal all-over print of key squares and paisley.",
     vpl27: "Bold baroque leaves over a small key-pattern ground.",
     vpl28: "A diamond lattice print with brushed streaks across it.",
+    vpl29: "A plaid of bold crossing bands with fine coloured lines.",
+    vpl30: "A wavy tiger-stripe print with silver streaks through it.",
+    vpl31: "Vertical brushed streaks in mixed tones from collar to hem.",
+    vpl33: "A small flower motif repeated in a grid, edge to edge.",
+    vpl34: "Round lion medallions and diagonal chain bands over a key-pattern ground.",
+    vpl35: "Baroque scrolls and chain links over a key-pattern ground.",
+    vpl36: "Bold striped panels over a small flower-dot ground.",
+    vpl37: "Small circles, diamonds and four-point stars repeated in a grid.",
+    vpl38: "A large, bold check plaid.",
+    vpl39: "Vertical rows of small diamond motifs, with a chest pocket.",
+    vpl40: "A small all-over medallion print, with a chest pocket.",
     vdm03: "Boot cut jeans with a V stitched on each back pocket under a studded band.",
     vdm05: "Boot cut jeans with layered V embroidery on the back pockets and heavy contrast stitching.",
     vdm06: "Boot cut jeans with a wide flare and bold geometric V embroidery on the back pockets.",
@@ -74,9 +93,9 @@
     if (!it.flat) return;
     var code = it.id.split("_")[0];
     it.desc = DESC[code];
-    it.price = /^(vdm|vmd)/.test(code) ? 79.99 : /^(vpl1[5689]|vps08|vps10)$/.test(code) ? 69.99 : 49.99;
+    if (!it.photo) it.price = /^(vdm|vmd)/.test(code) ? 79.99 : /^(vpl1[5689]|vps08|vps10)$/.test(code) ? 69.99 : 49.99;
   });
-  console.assert(ITEMS.every(function (it) { return !it.flat || (it.desc && it.price > 0); }) && item("vpl15_red").price === 69.99 && item("vps12_navy").price === 49.99 && item("vmd05_black_back").price === 79.99, "photo-set piece without a description or with the wrong price");
+  console.assert(ITEMS.every(function (it) { return !it.flat || (it.desc && (it.photo ? !it.price : it.price > 0)); }) && item("vpl15_red").price === 69.99 && item("vps12_navy").price === 49.99 && item("vmd05_black_back").price === 79.99 && item("vpl29_grey").photo, "photo-set piece without a description or with the wrong price");
   /* shortcut: sample size run, and no prices on the ten 3D pieces, because the studio has not sent them; put the real sizes here and a price (a number, in dollars) on each of those items when they do */
   var SIZES = {   // [label, how much wider the mannequin stands than at the middle size]
     top: [["S", 0.96], ["M", 1], ["L", 1.04], ["XL", 1.08], ["2XL", 1.12], ["3XL", 1.16]],
@@ -91,7 +110,7 @@
   /* the floor shows every shirt in turn: the 8 opening outfits, then each long sleeve and each polo, in the jeans its mannequin picture (img/on-<shirt>-<jeans>.webp) was made with */
   var LOOKS = HALL.map(function (h) { return [h[0], h[1]]; });
   ["vpl", "vps"].forEach(function (k) {
-    ITEMS.map(function (it) { return it.id; }).filter(function (id) { return id.indexOf(k) === 0; }).sort()
+    ITEMS.filter(function (it) { return !it.photo; }).map(function (it) { return it.id; }).filter(function (id) { return id.indexOf(k) === 0; }).sort()
       .forEach(function (id, i) { LOOKS.push([id, ["vdm07", "bc_blue", "bc_black", "bc_ice"][i % 4]]); });
   });
   /* a photo-set piece is shown on a mannequin too: a shirt in the picture the floor uses, jeans in their own img/on-<id>.webp */
@@ -112,7 +131,7 @@
   function full(it) { return it.name + T(" in ") + it.tone; }
   function item(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === id) return ITEMS[i]; }
   function kind(it) { return it.cat === "denim" ? "bottom" : "top"; }
-  function pic(it, cls) { var im = el("img", cls); im.src = "img/" + (it.flat ? WORN[it.id] || "on-" + it.id : it.id) + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
+  function pic(it, cls) { var im = el("img", cls); im.src = "img/" + (it.flat && !it.photo ? WORN[it.id] || "on-" + it.id : it.id) + ".webp"; im.alt = ""; im.decoding = "async"; if (it.flat) im.loading = "lazy"; return im; }
 
   document.addEventListener("DOMContentLoaded", function () {
     var grid = $("grid"), cats = $("cats"), floor = $("floor"), hall = $("hall"), ui = {}, size = { top: "M", bottom: "32" }, booted = false;
@@ -189,9 +208,9 @@
 
     /* ---- collection ---- */
     ITEMS.forEach(function (it) {
-      var li = el("li"), b = el("button", it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
+      var li = el("li"), b = el("button", it.photo ? "card flat photo" : it.flat ? "card flat" : "card"), n = el("span", "niche"), im = pic(it, "fig"), m = el("span", "meta");
       b.type = "button"; im.loading = "lazy";
-      im.alt = full(it) + T(" on a display mannequin");
+      im.alt = full(it) + (it.photo ? "" : T(" on a display mannequin"));
       n.appendChild(el("span", "beam")); n.appendChild(im);   // the light falls on the wall and plinth behind the mannequin
       m.appendChild(el("span", "cat", catName(it.cat))); m.appendChild(el("span", "name", it.name)); m.appendChild(el("span", "tone", it.tone));
       if (it.price) m.appendChild(el("span", "price", "$" + it.price.toFixed(2)));

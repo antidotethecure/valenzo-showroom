@@ -17,5 +17,7 @@ page off. Prices, sizes (a "Size" option on the product) and stock are changed i
 
 - A card is matched by style number and colour: Shopify product "VPL15 Long Sleeve Shirt" with Color "Black" is the card `vpl15_black`.
   A new colour or style needs its card in `valenzo.js` (and its mannequin picture in `img/`: `on-<shirt>-<jeans>.webp`, or `on-<id>.webp` for jeans) to be sold here.
+  A piece listed with `photo: true` in `valenzo.js` (the 11-20 long sleeves) shows its studio photo `img/<id>.webp` on white, stays off the floor
+  and shows no price until its mannequin picture is made and the studio sends a price.
 - Checkout is a Shopify cart link on `shop.valenzoclothing.com`. If the store's main address ever changes, change `SHOP` in
   `cart.js` and the same address in the `Content-Security-Policy` line of `index.html`.

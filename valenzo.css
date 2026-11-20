@@ -96,6 +96,8 @@ h2 { margin: .35em 0 .7em; font: 500 clamp(1.9rem, 4.4vw, 3.3rem)/1.12 var(--ser
 .card:hover .beam, .card:focus-visible .beam, .card.lit .beam { opacity: 1; }
 .card:hover .fig, .card:focus-visible .fig, .card.lit .fig { transform: scale(1.035); }
 .flat .fig { top: 10%; height: 70%; object-fit: contain; object-position: 50% 100%; transform-origin: 50% 100%; }   /* img/on-*.webp are cropped to the figure: stand its base plate on the plinth, at the size of the other mannequins */
+.photo .fig { top: 0; height: 100%; object-position: 50% 50%; background: #fefefe; }   /* a studio photo on white, shown whole, until the piece has its mannequin picture */
+.card.photo:hover .niche, .card.photo:focus-visible .niche, .card.photo.lit .niche { filter: none; }   /* extra brightness washes out a white shirt on white */
 .meta { display: block; padding: 1rem .3rem 1.4rem; }
 .cat { display: block; margin: 0; font: 400 .64rem/1.4 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
 .name { display: block; margin-top: .25rem; font: 500 1.3rem/1.2 var(--serif); }
